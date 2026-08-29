@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google-site-verification" content="k1qt79ZFjV59eUs24q5_GN1tVOtvvmOxf3K6f8GbrFo" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <title>Sabuj Disha</title>
+    
+    <!-- Elegant Minimalist Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Ultra-dark, almost black but with a 1% green tint for nature feel */
+            --bg-zen: #010503; 
+            --text-namaskar: rgba(235, 245, 240, 0.7);
+            --text-title: #f8fafc;
+            --accent-mint: #34d399;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-zen);
+            position: fixed;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Pure, clean background. No heavy gradients. */
+        #intro-screen {
+            position: fixed;
+            inset: 0;
+            background-color: var(--bg-zen);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 1s ease-in-out, visibility 1s;
+        }
+
+        .intro-container {
+            text-align: center;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Namaskar - Very soft, respectful, and slightly muted */
+        .namaskar-text {
+            color: var(--text-namaskar);
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: clamp(24px, 6vw, 32px); 
+            font-weight: 400;
+            margin-bottom: 15px;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: delicateFade 1.2s ease-out forwards 0.2s;
+        }
+
+        /* Welcome Text - Thin, wide letter spacing, very elegant */
+        .welcome-text {
+            color: var(--text-title);
+            font-size: clamp(20px, 5vw, 28px);
+            font-weight: 300; /* Minimalist light weight */
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: delicateFadeTracking 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.8s;
+        }
+
+        /* 1px Hairline Loading - Super minimal and clean */
+        .boot-line-container {
+            width: 140px; 
+            height: 1px;
+            background: rgba(255, 255, 255, 0.08);
+            margin-top: 35px;
+            position: relative;
+            opacity: 0;
+            animation: delicateFade 1s ease forwards 1.2s;
+        }
+
+        .boot-line-fill {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            height: 100%;
+            width: 0%;
+            transform: translateX(-50%);
+            background: var(--accent-mint);
+            box-shadow: 0 0 8px rgba(52, 211, 153, 0.3); /* Very subtle glow */
+            transition: width 0.3s ease-out;
+        }
+
+        /* --- Minimalist Keyframes --- */
+        @keyframes delicateFade {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes delicateFadeTracking {
+            from { 
+                opacity: 0; 
+                transform: translateY(8px);
+                letter-spacing: 1px; /* Starts tight, expands elegantly */
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+                letter-spacing: 5px;
+            }
+        }
+
+        /* Smooth Fade out to App */
+        #intro-screen.dissolve {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .app-wrapper {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-zen);
+        }
+
+        #app-container {
+            width: 100%;
+            height: 100%;
+            border: none;
+            opacity: 0;
+            transition: opacity 1.5s ease-out; /* Very slow, calming transition to the app */
+        }
+
+        #app-container.loaded {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Intro Audio File  
+    <audio id="intro-audio" src="sabuj.mp3" preload="auto"></audio>
+     -->
+     
+    <!-- Zen Minimalist Intro Screen -->
+    <div id="intro-screen">
+        <div class="intro-container">
+            <div class="namaskar-text">Namaskar 🙏</div>
+            <div class="welcome-text">Sabuj Disha</div>
+            
+            <div class="boot-line-container">
+                <div class="boot-line-fill" id="boot-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Web App -->
+    <div class="app-wrapper">
+        <iframe id="app-container" 
+                src="https://dev-mirror-engine.lovable.app" 
+                allowfullscreen 
+                allow="camera; microphone; geolocation; autoplay; clipboard-write; display-capture">
+        </iframe>
+    </div>
+
+    <script>
+        const iframe = document.getElementById('app-container');
+        const introScreen = document.getElementById('intro-screen');
+        const bootLine = document.getElementById('boot-line');
+        const introAudio = document.getElementById('intro-audio');
+
+        let progress = 0;
+
+        // Elegant, slow loading progression
+        const lineInterval = setInterval(() => {
+            if (progress < 90) {
+                progress += (Math.random() * 10) + 2; 
+                if (progress > 90) progress = 90;
+                bootLine.style.width = progress + '%';
+            }
+        }, 60); 
+
+        function launchApp() {
+            clearInterval(lineInterval);
+            bootLine.style.width = '100%';
+
+            // Smooth dissolve timing
+            setTimeout(() => {
+                iframe.classList.add('loaded');
+                introScreen.classList.add('dissolve');
+            }, 500);
+        }
+
+        // Wait for iframe to load, then trigger calm transition
+        iframe.onload = function() {
+            try {
+                introAudio.volume = 0.5; // Very soft volume for a calming entry
+                let playPromise = introAudio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Audio waiting for user interaction.");
+                    });
+                }
+            } catch(e) {}
+
+            setTimeout(() => {
+                launchApp();
+            }, 1800); // Wait just a little longer to let the user enjoy the peace
+        };
+    </script>
+
+</body>
+</html>
